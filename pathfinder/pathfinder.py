@@ -91,7 +91,7 @@ def shortest(v, path):
 import heapq
 
 def dijkstra(aGraph, start):
-    print("Dijkstra's shortest path")
+    #print("Dijkstra's shortest path")
     # Set the distance for the start node to zero 
     start.set_distance(0)
 
@@ -115,11 +115,11 @@ def dijkstra(aGraph, start):
             if new_dist < next.get_distance():
                 next.set_distance(new_dist)
                 next.set_previous(current)
-                print('updated : current = %s next = %s new_dist = %s' \
-                        %(current.get_id(), next.get_id(), next.get_distance()))
-            else:
-                print('not updated : current = %s next = %s new_dist = %s' \
-                        %(current.get_id(), next.get_id(), next.get_distance()))
+                #print('updated : current = %s next = %s new_dist = %s' \
+                #        %(current.get_id(), next.get_id(), next.get_distance()))
+            #else:
+                #print('not updated : current = %s next = %s new_dist = %s' \
+                #        %(current.get_id(), next.get_id(), next.get_distance()))
 
         # Rebuild heap
         # 1. Pop every item
@@ -132,35 +132,38 @@ def dijkstra(aGraph, start):
 
 if __name__ == '__main__':
 
-    # FIND UNIQUE CITIES
-    uniquecities = []
-    for row in timetables:
-        if row[0] not in uniquecities:
-            uniquecities.append(row[0])
-    print(len(uniquecities))
+    def pathfinder(start,end):
 
-    g = Graph()
+        # FIND UNIQUE CITIES
+        uniquecities = []
+        for row in timetables:
+            if row[0] not in uniquecities:
+                uniquecities.append(row[0])
 
-    # Add vertices
-    for city in uniquecities:
-        g.add_vertex(city)
+        g = Graph()
 
-    # Add edges
-    for row in timetables:
-        print(row[0], row[1], row[2])
-        g.add_edge(row[0], row[1], int(row[2]))
+        # Add vertices
+        for city in uniquecities:
+            g.add_vertex(city)
 
-    print('Graph data:')
-    for v in g:
-        for w in v.get_connections():
-            vid = v.get_id()
-            wid = w.get_id()
-            print('( %s , %s, %3d)'  % ( vid, wid, v.get_weight(w)))
+        # Add edges
+        for row in timetables:
+            g.add_edge(row[0], row[1], int(row[2]))
 
-            
-    dijkstra(g, g.get_vertex('Gare de Tarbes')) 
+        #print('Graph data:')
+        for v in g:
+            for w in v.get_connections():
+                vid = v.get_id()
+                wid = w.get_id()
+                #print('( %s , %s, %3d)'  % ( vid, wid, v.get_weight(w)))
 
-    target = g.get_vertex('Gare de Strasbourg')
-    path = [target.get_id()]
-    shortest(target, path)
-    print('The shortest path : %s' %(path[::-1]))
+                
+        dijkstra(g, g.get_vertex(start)) 
+
+        target = g.get_vertex(end)
+        path = [target.get_id()]
+        shortest(target, path)
+        print('The shortest path : %s' %(path[::-1]))
+  
+
+    pathfinder('Gare de Tarbes','Gare de Ax-les-Thermes')

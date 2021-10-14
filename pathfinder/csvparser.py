@@ -10,4 +10,4 @@ with open('timetables.csv', newline='') as f:
         cities.append(time)
         timetables.append(cities)
 
-print(timetables)
+#print(timetables)
