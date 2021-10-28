@@ -20,9 +20,9 @@ body {
   ) !important;
   background-size: 1800% 1800% !important;
 
-  -webkit-animation: AnimationName 33s ease infinite !important;
-  -moz-animation: AnimationName 33s ease infinite !important;
-  animation: AnimationName 33s ease infinite !important;
+  -webkit-animation: AnimationName 30s ease infinite;
+  -moz-animation: AnimationName 30s ease infinite;
+  animation: AnimationName 30s ease infinite;
 }
 
 code {
