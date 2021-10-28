@@ -9,6 +9,10 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^27.0.2",
+    "@types/node": "^16.11.6",
+    "@types/react": "^17.0.33",
+    "@types/react-dom": "^17.0.10",
     "framer-motion": "^4",
     "hark": "^1.2.3",
     "inline-worker": "^1.1.0",
@@ -16,6 +20,7 @@
     "react-dom": "^17.0.2",
     "react-icons": "^4.3.1",
     "react-scripts": "4.0.3",
+    "typescript": "^4.4.4",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
@@ -41,5 +46,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/hark": "^1.2.2"
   }
 }

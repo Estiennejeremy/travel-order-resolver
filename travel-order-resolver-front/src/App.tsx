@@ -4,6 +4,7 @@ import { Heading, Stack, Text, Box } from "@chakra-ui/layout";
 import { IconButton, keyframes } from "@chakra-ui/react";
 import { FaMicrophone } from "react-icons/fa";
 import useSpeechToText from "./Hooks";
+import { ResultType } from "./Hooks/index";
 import "./App.css";
 
 function App() {
@@ -101,6 +102,7 @@ function App() {
           specifying your starting point
         </Text>
         <IconButton
+          aria-label="record"
           isRound={true}
           icon={<FaMicrophone />}
           size="lg"
@@ -113,7 +115,7 @@ function App() {
         </Text>
         <Error />
         <ul>
-          {results.map((result) => (
+          {(results as ResultType[]).map((result: ResultType) => (
             <li key={result.timestamp}>{result.transcript}</li>
           ))}
           {interimResult && <li>{interimResult}</li>}

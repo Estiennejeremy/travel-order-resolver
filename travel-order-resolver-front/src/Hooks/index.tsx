@@ -2,19 +2,60 @@ import { useState, useEffect, useRef } from "react";
 import Hark from "hark";
 import { startRecording, stopRecording } from "./recorderHelpers";
 
+// https://cloud.google.com/speech-to-text/docs/reference/rest/v1/RecognitionConfig
+import { GoogleCloudRecognitionConfig } from "./GoogleCloudRecognitionConfig";
+
+interface SpeechGrammar {
+  src: string;
+  weight: number;
+}
+interface SpeechGrammarList {
+  length: number;
+  item(index: number): SpeechGrammar;
+  [index: number]: SpeechGrammar;
+  addFromURI(src: string, weight: number): void;
+  addFromString(string: string, weight: number): void;
+}
+// https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition
+export interface SpeechRecognitionProperties {
+  // continuous: do not pass continuous here, instead pass it as a param to the hook
+  grammars?: SpeechGrammarList;
+  interimResults?: boolean;
+  lang?: string;
+  maxAlternatives?: number;
+}
+
 const isEdgeChromium = navigator.userAgent.indexOf("Edg/") !== -1;
 
-const AudioContext = window.AudioContext || window.webkitAudioContext;
+interface BraveNavigator extends Navigator {
+  brave: {
+    isBrave: () => Promise<boolean>;
+  };
+}
+
+const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+  }
+}
 
 const SpeechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
+  window.SpeechRecognition || (window as any).webkitSpeechRecognition;
 
-let recognition;
+let recognition: typeof SpeechRecognition | null;
+
+export type ResultType = {
+  speechBlob?: Blob;
+  timestamp: number;
+  transcript: string;
+};
 
 // Set recognition back to null for brave browser due to promise resolving
 // after the conditional on line 31
-if (navigator.brave) {
-  navigator.brave.isBrave().then((bool) => {
+if ((navigator as BraveNavigator).brave) {
+  (navigator as BraveNavigator).brave.isBrave().then((bool) => {
     if (bool) recognition = null;
   });
 }
@@ -24,6 +65,19 @@ if (navigator.brave) {
 // this covers new Edge and line 22 covers Brave, the two most popular non-chrome chromium browsers
 if (!isEdgeChromium && SpeechRecognition) {
   recognition = new SpeechRecognition();
+}
+
+export interface UseSpeechToTextTypes {
+  continuous?: boolean;
+  crossBrowser?: boolean;
+  googleApiKey?: string;
+  googleCloudRecognitionConfig?: GoogleCloudRecognitionConfig;
+  onStartSpeaking?: () => any;
+  onStoppedSpeaking?: () => any;
+  speechRecognitionProperties?: SpeechRecognitionProperties;
+  timeout?: number;
+  useLegacyResults?: boolean;
+  useOnlyGoogleCloud?: boolean;
 }
 
 export default function useSpeechToText({
@@ -37,19 +91,19 @@ export default function useSpeechToText({
   timeout = 10000,
   useOnlyGoogleCloud = false,
   useLegacyResults = true,
-}) {
+}: UseSpeechToTextTypes) {
   const [isRecording, setIsRecording] = useState(false);
 
-  const audioContextRef = useRef();
+  const audioContextRef = useRef<AudioContext>();
 
-  const [legacyResults, setLegacyResults] = useState([]);
-  const [results, setResults] = useState([]);
+  const [legacyResults, setLegacyResults] = useState<string[]>([]);
+  const [results, setResults] = useState<ResultType[]>([]);
 
-  const [interimResult, setInterimResult] = useState();
+  const [interimResult, setInterimResult] = useState<string | undefined>();
   const [error, setError] = useState("");
 
-  const timeoutId = useRef();
-  const mediaStream = useRef();
+  const timeoutId = useRef<number>();
+  const mediaStream = useRef<MediaStream>();
 
   useEffect(() => {
     if (!crossBrowser && !recognition) {
@@ -97,7 +151,7 @@ export default function useSpeechToText({
       recognition.start();
 
       // speech successfully translated into text
-      recognition.onresult = (e) => {
+      recognition.onresult = (e: any) => {
         const result = e.results[e.results.length - 1];
         const { transcript } = result[0];
 
@@ -159,7 +213,7 @@ export default function useSpeechToText({
 
     const stream = await startRecording({
       errHandler: () => setError("Microphone permission was denied"),
-      audioContext: audioContextRef.current,
+      audioContext: audioContextRef.current as AudioContext,
     });
 
     setIsRecording(true);
@@ -179,7 +233,7 @@ export default function useSpeechToText({
     mediaStream.current = stream.clone();
 
     const speechEvents = Hark(mediaStream.current, {
-      audioContext: audioContextRef.current,
+      audioContext: audioContextRef.current as AudioContext,
     });
 
     speechEvents.on("speaking", () => {
@@ -225,12 +279,18 @@ export default function useSpeechToText({
     }, timeout);
   };
 
-  const handleBlobToBase64 = ({ blob, continuous }) => {
+  const handleBlobToBase64 = ({
+    blob,
+    continuous,
+  }: {
+    blob: Blob;
+    continuous: boolean;
+  }) => {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
 
     reader.onloadend = async () => {
-      const base64data = reader.result;
+      const base64data = reader.result as string;
 
       let sampleRate = audioContextRef.current?.sampleRate;
 
@@ -242,7 +302,7 @@ export default function useSpeechToText({
 
       const audio = { content: "" };
 
-      const config = {
+      const config: GoogleCloudRecognitionConfig = {
         encoding: "LINEAR16",
         languageCode: "en-US",
         sampleRateHertz: sampleRate,

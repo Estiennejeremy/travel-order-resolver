@@ -2,65 +2,11 @@
   animation: pulse 1s infinite;
 }
 
-.bg {
-  background: linear-gradient(
-    221deg,
-    #e53e3e,
-    #dd6b20,
-    #d69e2e,
-    #38a169,
-    #319795,
-    #3182ce,
-    #00b5d8,
-    #805ad5,
-    #d53f8c
-  ) !important;
-  background-size: 1800% 1800%;
-
-  -webkit-animation: gradientAnimation 30s ease infinite;
-  -moz-animation: gradientAnimation 30s ease infinite;
-  animation: gradientAnimation 30s ease infinite;
-}
-
 @keyframes pulse {
   0% {
     box-shadow: 0 0 0 0px rgb(218, 18, 18);
   }
   100% {
     box-shadow: 0 0 0 20px rgba(40, 167, 69, 0);
-  }
-}
-
-@-webkit-keyframes gradientAnimation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-@-moz-keyframes gradientAnimation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-@keyframes gradientAnimation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
   }
 }
