@@ -17,12 +17,12 @@ body {
     #00b5d8,
     #805ad5,
     #d53f8c
-  );
-  background-size: 1800% 1800%;
+  ) !important;
+  background-size: 1800% 1800% !important;
 
-  -webkit-animation: AnimationName 33s ease infinite;
-  -moz-animation: AnimationName 33s ease infinite;
-  animation: AnimationName 33s ease infinite;
+  -webkit-animation: AnimationName 33s ease infinite !important;
+  -moz-animation: AnimationName 33s ease infinite !important;
+  animation: AnimationName 33s ease infinite !important;
 }
 
 code {
