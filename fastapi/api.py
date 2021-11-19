@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from typing import Optional
 from pydantic import BaseModel
+from nlp import analyse
 
 app = FastAPI()
 
@@ -17,5 +18,5 @@ def return_trajet(trajet: str):
 
 
 def nlp(trajet):
-    trip = []
-    return trajet
+    return analyse(trajet)
+    
