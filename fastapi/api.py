@@ -6,7 +6,7 @@ app = FastAPI()
 
 @app.get("/")
 def home():
-    return {"data":"Test"}
+    return "COUCOU"
 
 @app.post("/nlp")
 def return_trajet(trajet: str):
