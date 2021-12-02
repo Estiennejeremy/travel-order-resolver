@@ -1,0 +1,12 @@
+[data-recording="true"] {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0px rgb(218, 18, 18);
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(40, 167, 69, 0);
+  }
+}
