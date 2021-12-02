@@ -130,40 +130,44 @@ def dijkstra(aGraph, start):
         heapq.heapify(unvisited_queue)
 
 
-if __name__ == '__main__':
+#if __name__ == '__main__':
 
-    def pathfinder(start,end):
+def pathfinder(start,end):
+    print(start)
+    print(end)
 
-        # FIND UNIQUE CITIES
-        uniquecities = []
-        for row in timetables:
-            if row[0] not in uniquecities:
-                uniquecities.append(row[0])
+    # FIND UNIQUE CITIES
+    uniquecities = []
+    for row in timetables:
+        if row[0] not in uniquecities:
+            uniquecities.append(row[0])
 
-        g = Graph()
+    g = Graph()
 
-        # Add vertices
-        for city in uniquecities:
-            g.add_vertex(city)
+    # Add vertices
+    for city in uniquecities:
+        g.add_vertex(city)
 
-        # Add edges
-        for row in timetables:
-            g.add_edge(row[0], row[1], int(row[2]))
+    # Add edges
+    for row in timetables:
+        g.add_edge(row[0], row[1], int(row[2]))
 
-        #print('Graph data:')
-        for v in g:
-            for w in v.get_connections():
-                vid = v.get_id()
-                wid = w.get_id()
-                #print('( %s , %s, %3d)'  % ( vid, wid, v.get_weight(w)))
+    #print('Graph data:')
+    for v in g:
+        for w in v.get_connections():
+            vid = v.get_id()
+            wid = w.get_id()
+            #print('( %s , %s, %3d)'  % ( vid, wid, v.get_weight(w)))
 
-                
-        dijkstra(g, g.get_vertex(start)) 
+            
+    dijkstra(g, g.get_vertex(start)) 
 
-        target = g.get_vertex(end)
-        path = [target.get_id()]
-        shortest(target, path)
-        print('The shortest path : %s' %(path[::-1]))
+    target = g.get_vertex(end)
+    path = [target.get_id()]
+    shortest(target, path)
+    #print('The shortest path : %s' %(path[::-1]))
+    print(path[::-1])
+    return path[::-1]
   
 
-    pathfinder('Gare de Tarbes','Gare de Ax-les-Thermes')
+#pathfinder('Gare de Tarbes','Gare de Ax-les-Thermes')

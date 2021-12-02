@@ -6,12 +6,11 @@ from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 import json
+from pathfinder import pathfinder
+from stationparser import find_similar_station
 
 class Item(BaseModel):
     trajet: str
-
-class ResJson(BaseModel):
-    result: Optional[str]
 
 app = FastAPI()
 
@@ -21,14 +20,21 @@ def home():
 
 @app.post("/nlp")
 def return_trajet(item: Item):
-    print(analyse(item.trajet))
-    print(type(analyse(item.trajet)))
-    
-    print(type(analyse(item.trajet)[0]))
     if item.trajet != "":
         analyseres = analyse(item.trajet)
-        return {'result': analyseres}
-    else: 
+        print(analyseres)
+        #city = pathfinder(analyseres[0], analyseres[1])
+        start = "Gare de " + find_similar_station(analyseres[0])
+        print(find_similar_station(analyseres[0]))
+        end = "Gare de " + find_similar_station(analyseres[1])
+        print(start)
+        print(end)
+        city = pathfinder(start, end)
+        return {'result': city}
+    else:
         return {'result': "null"}
-
     
+@app.get("/test")
+def test():
+    print("LA FERME")
+    return {'result': "OSKOUR"}
