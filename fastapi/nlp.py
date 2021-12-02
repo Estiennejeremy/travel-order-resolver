@@ -191,10 +191,10 @@ def ORDER_START(wToks):
         token, weight = wToks[i]
         if weight.direct == Direct.START:
             if weight.force == Force.STRONG:
-                OrderedCities.insert(sizeForce, token)
+                OrderedCities.insert(sizeForce, token.text)
                 sizeForce = sizeForce + 1
             else:
-                OrderedCities.append(token)
+                OrderedCities.append(token.text)
     ORDER_DEST(wToks)
 
 def ORDER_DEST(wToks):
@@ -203,25 +203,26 @@ def ORDER_DEST(wToks):
         token, weight = wToks[i]
         if weight.direct == Direct.DEST:
             if weight.force == Force.STRONG:
-                OrderedCities.append(token)
+                OrderedCities.append(token.text)
                 sizeForce = sizeForce + 1
             else:
                 if sizeForce == 0:
-                    OrderedCities.append(token)
+                    OrderedCities.append(token.text)
                 else:
-                    OrderedCities.insert(len(OrderedCities)-sizeForce, token)
+                    OrderedCities.insert(len(OrderedCities)-sizeForce, token.text)
     
 
 def analyse(sentence):
-    print(f"Request: {sentence}")
+    #print(f"Request: {sentence}")
     nlp = spacy.load("fr_core_news_sm")
     doc = nlp(sentence)
+    #print("CouCou je suis ici")
     locs = []
     fullTrip = []
     for i in doc.ents:
         if i.label_ == 'LOC' or i.label_ == 'GPE': 
             locs.append(i.text)
-    print(f"locs found: {locs}")
+    #print(f"locs found: {locs}")
 
     if len(locs) <= 1:
         print("Cannot parse request or invalid request.")
@@ -243,7 +244,7 @@ def analyse(sentence):
                     tokenToped = True
             
             if tokenToped == False:
-                print(f"Localization {locs[i]} not found")
+                #print(f"Localization {locs[i]} not found")
                 tokens[i] = None
 
         tmpTokens = tokens
@@ -255,7 +256,7 @@ def analyse(sentence):
 
         wToks = np.zeros(len(tokens), dtype=object)
         for i in range(len(tokens)):
-            print(f"Token #{i+1} : {tokens[i].lemma_}")
+            #print(f"Token #{i+1} : {tokens[i].lemma_}")
             global fw
             fw = []
             parent = tokens[i].head
@@ -282,7 +283,7 @@ def analyse(sentence):
                 LINK_VERB_CHECK(parent)
                 
             if len(fw) == 0: 
-                print(f"Using default weight")
+                #print(f"Using default weight")
                 fw.append(WordLinkSolo("default", Direct.DEST,  Force.WEAK))
 
             
@@ -294,8 +295,8 @@ def analyse(sentence):
             if selectedWeight is None:
                 selectedWeight = fw[0]
 
-            print(f"Using: {selectedWeight.word}")
-            print("---------------")
+            #print(f"Using: {selectedWeight.word}")
+            #print("---------------")
             wToks[i] = (tokens[i], selectedWeight)
 
         global OrderedCities
@@ -309,4 +310,4 @@ def analyse(sentence):
 
 
 
-print(analyse("Je souhaite prendre le train à Tarbes et avancer calmement jusqu'a Brest"))
+# print(analyse("Je souhaite prendre le train à Tarbes et avancer calmement jusqu'a Brest"))
