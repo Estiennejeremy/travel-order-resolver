@@ -10,6 +10,7 @@ import {
   ListItem,
   Center,
 } from "@chakra-ui/layout";
+import { Image } from "@chakra-ui/react";
 import { IconButton, keyframes } from "@chakra-ui/react";
 import { FaMicrophone } from "react-icons/fa";
 import useSpeechToText from "./Hooks";
@@ -29,7 +30,16 @@ function App() {
     background-position: 0% 50%;
   }
 `;
+  const trainPosition = keyframes`
+  0% {
+    transform: translateX(-700px);
+  }
+  100% {
+    transform: translateX(2000px);
+  }
+`;
   const animation = `${gradientAnimation} 30s ease infinite`;
+  const trainstart = `${trainPosition} 7s cubic-bezier(0.11, 0, 0.5, 0) forwards`;
   const {
     error,
     interimResult,
@@ -94,6 +104,7 @@ function App() {
     <Box
       width={"100%"}
       height={"100vh"}
+      minHeight={"100vh"}
       bgGradient="linear-gradient(
     221deg,
     #e53e3e,
@@ -175,6 +186,12 @@ function App() {
           </Box>
         </Flex>
       </Stack>
+      <Image
+        src={"/train.png"}
+        animation={trainstart}
+        position={"fixed"}
+        bottom={0}
+      />
     </Box>
   );
 }
