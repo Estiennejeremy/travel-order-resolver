@@ -1,25 +1,16 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import {
-  Heading,
-  Stack,
-  Text,
-  Box,
-  Flex,
-  List,
-  Center,
-} from "@chakra-ui/layout";
+import { Heading, Stack, Text, Box, Flex, Center } from "@chakra-ui/layout";
 import { IconButton } from "@chakra-ui/react";
 import { FaMicrophone } from "react-icons/fa";
 import useSpeechToText from "./Hooks";
 import { ResultType } from "./Hooks/index";
 import axios from "axios";
 import "./App.css";
-import JourneyItem from "./components/JourneyItem";
-import OrderItem from "./components/OrderItem";
 import GradiantBackground from "./components/GradiantBackground";
 import Train from "./components/Train";
 import ErrorDisplay from "./components/ErrorDisplay";
+import OrdersAndJourney from "./components/OrdersAndTravels";
 
 function App() {
   const {
@@ -37,7 +28,7 @@ function App() {
     speechRecognitionProperties: { interimResults: false },
     useLegacyResults: false,
   });
-  const [listOfJourney, setListOfJourney] = useState<string[][]>([]);
+  const [listOfTravel, setListOfTravel] = useState<string[][]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // Ask traversed station to backend when results change
@@ -52,9 +43,9 @@ function App() {
         })
         .then((res) => {
           res.status === 200 &&
-            setListOfJourney([...listOfJourney, res.data.result]);
+            setListOfTravel([...listOfTravel, res.data.result]);
           res.status === 204 &&
-            setListOfJourney([...listOfJourney, ["Pas de résultat"]]);
+            setListOfTravel([...listOfTravel, ["Pas de résultat"]]);
         })
         .catch((err) => {
           console.error(err);
@@ -97,9 +88,6 @@ function App() {
                 Orders
               </Heading>
             </Center>
-            <List spacing={3}>
-              <OrderItem results={results} />
-            </List>
           </Box>
           <Box width={"45%"}>
             <Center>
@@ -107,11 +95,9 @@ function App() {
                 Travel journey
               </Heading>
             </Center>
-            <List spacing={3}>
-              <JourneyItem listOfJourney={listOfJourney} />
-            </List>
           </Box>
         </Flex>
+        <OrdersAndJourney listOfTravel={listOfTravel} results={results} />
       </Stack>
       <Train />
     </GradiantBackground>
