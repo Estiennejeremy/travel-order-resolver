@@ -13,6 +13,7 @@
     "@types/node": "^16.11.6",
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
+    "axios": "^0.24.0",
     "framer-motion": "^4",
     "hark": "^1.2.3",
     "inline-worker": "^1.1.0",

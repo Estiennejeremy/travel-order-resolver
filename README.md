@@ -1,16 +1,16 @@
 # ITOR
+
 Install fastapi et uvicorn
 
-	$ pip install fastapi
+    $ pip install fastapi
 
-	$ pip install uvicorn
+    $ pip install uvicorn
 
 launch fastapi
-	
-	lauch cmd.exe
+lauch cmd.exe
 
-	$cd ..\T-AIA-901_msc2022_group-23\fastapi
+    $cd ..\T-AIA-901_msc2022_group-23\fastapi
 
-	$ python -m uvicorn api:app --reload 
+    $ python3 -m uvicorn api:app --reload
 
 ip adress : 127.0.0.1:8000

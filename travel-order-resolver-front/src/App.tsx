@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
-import { Heading, Stack, Text, Box } from "@chakra-ui/layout";
+import {
+  Heading,
+  Stack,
+  Text,
+  Box,
+  Flex,
+  List,
+  ListItem,
+  Center,
+} from "@chakra-ui/layout";
 import { IconButton, keyframes } from "@chakra-ui/react";
 import { FaMicrophone } from "react-icons/fa";
 import useSpeechToText from "./Hooks";
 import { ResultType } from "./Hooks/index";
+import axios from "axios";
 import "./App.css";
 
 function App() {
@@ -31,7 +41,7 @@ function App() {
     continuous: true,
     crossBrowser: true,
     googleApiKey: process.env.REACT_APP_API_KEY,
-    speechRecognitionProperties: { interimResults: true },
+    speechRecognitionProperties: { interimResults: false },
     useLegacyResults: false,
   });
 
@@ -56,23 +66,29 @@ function App() {
     }
     return null;
   };
+  const [listOfJourney, setListOfJourney] = useState<string[][]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  if (error) {
-    return (
-      <div
-        style={{
-          maxWidth: "600px",
-          margin: "100px auto",
-          textAlign: "center",
-        }}
-      >
-        <p>
-          {error}
-          <span style={{ fontSize: "3rem" }}>🤷‍</span>
-        </p>
-      </div>
-    );
-  }
+  // Ask traversed station to backend when results change
+  useEffect(() => {
+    if (results.length > 0) {
+      const speechResult = results[results.length - 1] as ResultType;
+      const lastOrder = speechResult.transcript;
+      setIsLoading(true);
+      axios
+        .post("http://localhost:8000/nlp/", {
+          trajet: lastOrder,
+        })
+        .then((res) => {
+          res.status === 200 &&
+            setListOfJourney([...listOfJourney, res.data.result]);
+          res.status === 204 &&
+            setListOfJourney([...listOfJourney, ["No result"]]);
+        });
+      setIsLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [results]);
 
   return (
     <Box
@@ -98,8 +114,8 @@ function App() {
           Travel Order Resolver
         </Heading>
         <Text fontSize="2xl" color="whiteAlpha.700" align="center">
-          Click on the "record" button and ask to go to a destination by
-          specifying your starting point
+          Click and hold your mouse on the "record" button while you order your
+          train journey.
         </Text>
         <IconButton
           aria-label="record"
@@ -107,19 +123,57 @@ function App() {
           icon={<FaMicrophone />}
           size="lg"
           colorScheme="red"
-          onClick={isRecording ? stopSpeechToText : startSpeechToText}
+          onMouseDown={startSpeechToText}
+          onMouseUp={stopSpeechToText}
+          onMouseLeave={stopSpeechToText}
           data-recording={isRecording}
+          isDisabled={isLoading}
         />
         <Text color="whiteAlpha.600">
           {isRecording ? "Stop Recording" : "Start Recording"}
         </Text>
         <Error />
-        <ul>
-          {(results as ResultType[]).map((result: ResultType) => (
-            <li key={result.timestamp}>{result.transcript}</li>
-          ))}
-          {interimResult && <li>{interimResult}</li>}
-        </ul>
+        <Flex justify={"space-evenly"} width={"full"}>
+          <Box width={"45%"}>
+            <Center>
+              <Heading as="h2" fontSize="2xl" color="whiteAlpha.700">
+                Orders
+              </Heading>
+            </Center>
+            <List spacing={3}>
+              {(results as ResultType[]).map((result) => (
+                <Center>
+                  <ListItem key={result.timestamp}>
+                    {result.transcript}
+                  </ListItem>
+                </Center>
+              ))}
+            </List>
+          </Box>
+          <Box width={"45%"}>
+            <Center>
+              <Heading as="h2" fontSize="2xl" color="whiteAlpha.700">
+                Travel journey
+              </Heading>
+            </Center>
+            <List spacing={3}>
+              {listOfJourney.length > 0 &&
+                listOfJourney.map((journey, index) => (
+                  <Center>
+                    <ListItem key={index}>
+                      <Text>
+                        {journey.map((city, index) => {
+                          return `${city}${
+                            index === journey.length - 1 ? "" : " ➡️ "
+                          }`;
+                        })}
+                      </Text>
+                    </ListItem>
+                  </Center>
+                ))}
+            </List>
+          </Box>
+        </Flex>
       </Stack>
     </Box>
   );
