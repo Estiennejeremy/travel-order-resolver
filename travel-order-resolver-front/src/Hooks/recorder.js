@@ -1,17 +1,17 @@
-import InlineWorker from 'inline-worker';
+import InlineWorker from "inline-worker";
 
 export class Recorder {
   constructor(source, cfg) {
     this.config = {
       bufferLen: 4096,
       numChannels: 1,
-      mimeType: 'audio/wav',
-      ...cfg
+      mimeType: "audio/wav",
+      ...cfg,
     };
     this.recording = false;
     this.callbacks = {
       getBuffer: [],
-      exportWAV: []
+      exportWAV: [],
     };
     this.context = source.context;
     this.node = (
@@ -31,8 +31,8 @@ export class Recorder {
         buffer.push(e.inputBuffer.getChannelData(channel));
       }
       this.worker.postMessage({
-        command: 'record',
-        buffer: buffer
+        command: "record",
+        buffer: buffer,
       });
     };
 
@@ -48,20 +48,22 @@ export class Recorder {
 
       this.onmessage = function (e) {
         switch (e.data.command) {
-          case 'init':
+          case "init":
             init(e.data.config);
             break;
-          case 'record':
+          case "record":
             record(e.data.buffer);
             break;
-          case 'exportWAV':
+          case "exportWAV":
             exportWAV(e.data.type);
             break;
-          case 'getBuffer':
+          case "getBuffer":
             getBuffer();
             break;
-          case 'clear':
+          case "clear":
             clear();
+            break;
+          default:
             break;
         }
       };
@@ -105,7 +107,7 @@ export class Recorder {
         let dataview = encodeWAV(downSampledBuffer);
         let audioBlob = new Blob([dataview], { type: type });
 
-        this.postMessage({ command: 'exportWAV', data: audioBlob });
+        this.postMessage({ command: "exportWAV", data: audioBlob });
       }
 
       function getBuffer() {
@@ -113,7 +115,7 @@ export class Recorder {
         for (let channel = 0; channel < numChannels; channel++) {
           buffers.push(mergeBuffers(recBuffers[channel], recLength));
         }
-        this.postMessage({ command: 'getBuffer', data: buffers });
+        this.postMessage({ command: "getBuffer", data: buffers });
       }
 
       function clear() {
@@ -168,11 +170,12 @@ export class Recorder {
 
       // Down sample buffer before WAV encoding
       function downSampleBuffer(buffer, rate) {
-        if (rate == sampleRate) {
+        if (rate === sampleRate) {
           return buffer;
         }
         if (rate > sampleRate) {
-          throw 'downsampling rate show be smaller than original sample rate';
+          // eslint-disable-next-line no-throw-literal
+          throw "downsampling rate show be smaller than original sample rate";
         }
         var sampleRateRatio = sampleRate / rate;
         var newLength = Math.round(buffer.length / sampleRateRatio);
@@ -208,13 +211,13 @@ export class Recorder {
         let view = new DataView(buffer);
 
         /* RIFF identifier */
-        writeString(view, 0, 'RIFF');
+        writeString(view, 0, "RIFF");
         /* RIFF chunk length */
         view.setUint32(4, 36 + samples.length * 2, true);
         /* RIFF type */
-        writeString(view, 8, 'WAVE');
+        writeString(view, 8, "WAVE");
         /* format chunk identifier */
-        writeString(view, 12, 'fmt ');
+        writeString(view, 12, "fmt ");
         /* format chunk length */
         view.setUint32(16, 16, true);
         /* sample format (raw) */
@@ -230,7 +233,7 @@ export class Recorder {
         /* bits per sample */
         view.setUint16(34, 16, true);
         /* data chunk identifier */
-        writeString(view, 36, 'data');
+        writeString(view, 36, "data");
         /* data chunk length */
         view.setUint32(40, samples.length * 2, true);
 
@@ -241,16 +244,16 @@ export class Recorder {
     }, self);
 
     this.worker.postMessage({
-      command: 'init',
+      command: "init",
       config: {
         sampleRate: this.context.sampleRate,
-        numChannels: this.config.numChannels
-      }
+        numChannels: this.config.numChannels,
+      },
     });
 
     this.worker.onmessage = (e) => {
       let cb = this.callbacks[e.data.command].pop();
-      if (typeof cb == 'function') {
+      if (typeof cb == "function") {
         cb(e.data.data);
       }
     };
@@ -265,38 +268,38 @@ export class Recorder {
   }
 
   clear() {
-    this.worker.postMessage({ command: 'clear' });
+    this.worker.postMessage({ command: "clear" });
   }
 
   getBuffer(cb) {
     cb = cb || this.config.callback;
-    if (!cb) throw new Error('Callback not set');
+    if (!cb) throw new Error("Callback not set");
 
     this.callbacks.getBuffer.push(cb);
 
-    this.worker.postMessage({ command: 'getBuffer' });
+    this.worker.postMessage({ command: "getBuffer" });
   }
 
   exportWAV(cb, mimeType) {
     mimeType = mimeType || this.config.mimeType;
     cb = cb || this.config.callback;
-    if (!cb) throw new Error('Callback not set');
+    if (!cb) throw new Error("Callback not set");
 
     this.callbacks.exportWAV.push(cb);
 
     this.worker.postMessage({
-      command: 'exportWAV',
-      type: mimeType
+      command: "exportWAV",
+      type: mimeType,
     });
   }
 
   static forceDownload(blob, filename) {
     let url = (window.URL || window.webkitURL).createObjectURL(blob);
-    let link = window.document.createElement('a');
+    let link = window.document.createElement("a");
     link.href = url;
-    link.download = filename || 'output.wav';
-    let click = document.createEvent('Event');
-    click.initEvent('click', true, true);
+    link.download = filename || "output.wav";
+    let click = document.createEvent("Event");
+    click.initEvent("click", true, true);
     link.dispatchEvent(click);
   }
 }

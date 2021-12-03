@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 from pydantic import BaseModel
@@ -34,21 +34,32 @@ def home():
 
 @app.post("/nlp")
 def return_trajet(item: Item):
-    if item.trajet != "":
-        analyseres = analyse(item.trajet)
-        print(analyseres)
-        #city = pathfinder(analyseres[0], analyseres[1])
-        start = "Gare de " + find_similar_station(analyseres[0])
-        print(find_similar_station(analyseres[0]))
-        end = "Gare de " + find_similar_station(analyseres[1])
-        print(start)
-        print(end)
-        city = pathfinder(start, end)
-        return {'result': city}
-    else:
-        return {'result': "null"}
-    
-@app.get("/test")
-def test():
-    print("LA FERME")
-    return {'result': "OSKOUR"}
+    try:
+        if item.trajet != "":
+            print("-----------------------------------------------------")
+            print(item.trajet)
+            
+            print("-----------------------------------------------------")
+            print("NLP PROCESSING...")
+            analyseres = analyse(item.trajet)
+            print(analyseres)
+            
+            print("-----------------------------------------------------")
+            print("Find similar start station : " + find_similar_station(analyseres[0]))
+            print("Find similar end station : " + find_similar_station(analyseres[1]))
+            print(find_similar_station(analyseres[0]))
+            print(find_similar_station(analyseres[1]))
+            start = "Gare de " + find_similar_station(analyseres[0])
+            end = "Gare de " + find_similar_station(analyseres[1])
+        
+            print("-----------------------------------------------------")
+            print("Recomposition of station")
+            print(start)
+            print(end)
+            print("-----------------------------------------------------")
+            city = pathfinder(start, end)
+            return {'result': city}
+        else:
+            raise HTTPException(status_code=204, detail="Item not found")    
+    except:
+        raise HTTPException(status_code=204, detail="Item not found")

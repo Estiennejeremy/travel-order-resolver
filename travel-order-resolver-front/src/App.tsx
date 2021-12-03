@@ -7,41 +7,24 @@ import {
   Box,
   Flex,
   List,
-  ListItem,
   Center,
 } from "@chakra-ui/layout";
-import { Image } from "@chakra-ui/react";
-import { IconButton, keyframes } from "@chakra-ui/react";
+import { IconButton } from "@chakra-ui/react";
 import { FaMicrophone } from "react-icons/fa";
 import useSpeechToText from "./Hooks";
 import { ResultType } from "./Hooks/index";
 import axios from "axios";
 import "./App.css";
+import JourneyItem from "./components/JourneyItem";
+import OrderItem from "./components/OrderItem";
+import GradiantBackground from "./components/GradiantBackground";
+import Train from "./components/Train";
+import ErrorDisplay from "./components/ErrorDisplay";
 
 function App() {
-  const gradientAnimation = keyframes`
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-`;
-  const trainPosition = keyframes`
-  0% {
-    transform: translateX(-700px);
-  }
-  100% {
-    transform: translateX(2000px);
-  }
-`;
-  const animation = `${gradientAnimation} 30s ease infinite`;
-  const trainstart = `${trainPosition} 7s cubic-bezier(0.11, 0, 0.5, 0) forwards`;
   const {
     error,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interimResult,
     isRecording,
     results,
@@ -54,28 +37,6 @@ function App() {
     speechRecognitionProperties: { interimResults: false },
     useLegacyResults: false,
   });
-
-  const Error = () => {
-    if (error) {
-      return (
-        <Box
-          style={{
-            maxWidth: "600px",
-            margin: "100px auto",
-            textAlign: "center",
-          }}
-        >
-          <Text>
-            {error}
-            <Text as="span" style={{ fontSize: "3rem" }}>
-              🤷‍
-            </Text>
-          </Text>
-        </Box>
-      );
-    }
-    return null;
-  };
   const [listOfJourney, setListOfJourney] = useState<string[][]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -93,7 +54,10 @@ function App() {
           res.status === 200 &&
             setListOfJourney([...listOfJourney, res.data.result]);
           res.status === 204 &&
-            setListOfJourney([...listOfJourney, ["No result"]]);
+            setListOfJourney([...listOfJourney, ["Pas de résultat"]]);
+        })
+        .catch((err) => {
+          console.error(err);
         });
       setIsLoading(false);
     }
@@ -101,25 +65,7 @@ function App() {
   }, [results]);
 
   return (
-    <Box
-      width={"100%"}
-      height={"100vh"}
-      minHeight={"100vh"}
-      bgGradient="linear-gradient(
-    221deg,
-    #e53e3e,
-    #dd6b20,
-    #d69e2e,
-    #38a169,
-    #319795,
-    #3182ce,
-    #00b5d8,
-    #805ad5,
-    #d53f8c
-  )"
-      bgSize="1800% 1800%"
-      animation={animation}
-    >
+    <GradiantBackground>
       <Stack py={4} direction="column" spacing={6} alignItems="center">
         <Heading as="h1" fontSize="4xl" color="whiteAlpha.700">
           Travel Order Resolver
@@ -143,7 +89,7 @@ function App() {
         <Text color="whiteAlpha.600">
           {isRecording ? "Stop Recording" : "Start Recording"}
         </Text>
-        <Error />
+        <ErrorDisplay error={error} />
         <Flex justify={"space-evenly"} width={"full"}>
           <Box width={"45%"}>
             <Center>
@@ -152,13 +98,7 @@ function App() {
               </Heading>
             </Center>
             <List spacing={3}>
-              {(results as ResultType[]).map((result) => (
-                <Center>
-                  <ListItem key={result.timestamp}>
-                    {result.transcript}
-                  </ListItem>
-                </Center>
-              ))}
+              <OrderItem results={results} />
             </List>
           </Box>
           <Box width={"45%"}>
@@ -168,31 +108,13 @@ function App() {
               </Heading>
             </Center>
             <List spacing={3}>
-              {listOfJourney.length > 0 &&
-                listOfJourney.map((journey, index) => (
-                  <Center>
-                    <ListItem key={index}>
-                      <Text>
-                        {journey.map((city, index) => {
-                          return `${city}${
-                            index === journey.length - 1 ? "" : " ➡️ "
-                          }`;
-                        })}
-                      </Text>
-                    </ListItem>
-                  </Center>
-                ))}
+              <JourneyItem listOfJourney={listOfJourney} />
             </List>
           </Box>
         </Flex>
       </Stack>
-      <Image
-        src={"/train.png"}
-        animation={trainstart}
-        position={"fixed"}
-        bottom={0}
-      />
-    </Box>
+      <Train />
+    </GradiantBackground>
   );
 }
 

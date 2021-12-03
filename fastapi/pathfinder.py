@@ -171,3 +171,4 @@ def pathfinder(start,end):
   
 
 #pathfinder('Gare de Tarbes','Gare de Ax-les-Thermes')
+pathfinder('Gare de Bayonne','Gare de Nice-Ville')
