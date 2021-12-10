@@ -168,7 +168,7 @@ def pathfinder(start,end):
     #print('The shortest path : %s' %(path[::-1]))
     print(path[::-1])
     print(target.get_distance())
-    return path[::-1]
+    return {"crossed_stations": path[::-1], "distance": target.get_distance()}
   
 ## TESTING
 #pathfinder('Gare de Tarbes','Gare de Ax-les-Thermes')
@@ -176,4 +176,4 @@ def pathfinder(start,end):
 #pathfinder('Gare de Paris-Montparnasse 1-2', 'Gare de Tarbes')
 #pathfinder('Gare de Paris-St-Lazare', 'Gare de Tarbes')
 #pathfinder("Gare de Paris-Austerlitz", "Gare de Tarbes")
-#pathfinder("Gare de Paris Gare du Nord", "Gare de Tarbes")
+pathfinder("Gare de Paris Gare du Nord", "Gare de Tarbes")

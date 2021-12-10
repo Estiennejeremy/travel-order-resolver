@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 import json
 from pathfinder import pathfinder
 from stationparser import find_similar_station
+from stationparser import find_stations_from_city
 
 class Item(BaseModel):
     trajet: str
@@ -51,15 +52,35 @@ def return_trajet(item: Item):
             print(find_similar_station(analyseres[1]))
             start = "Gare de " + find_similar_station(analyseres[0])
             end = "Gare de " + find_similar_station(analyseres[1])
+            
+            start_cities = find_stations_from_city(analyseres[0])
+            end_cities = find_stations_from_city(analyseres[1])
+            giga_result = find_shortest_path_between_cities(start_cities, end_cities)
+            
+            
         
             print("-----------------------------------------------------")
             print("Recomposition of station")
             print(start)
             print(end)
             print("-----------------------------------------------------")
-            city = pathfinder(start, end)
-            return {'result': city}
+            pathfinder_result = pathfinder(start, end)
+            crossed_stations = pathfinder_result["crossed_stations"]
+            return {'result': giga_result["crossed_stations"]}
         else:
             raise HTTPException(status_code=204, detail="Item not found")    
     except:
         raise HTTPException(status_code=204, detail="Item not found")
+    
+    
+def find_shortest_path_between_cities(start_cities, end_cities):
+    results = []
+    for start_city in start_cities:
+        for end_city in end_cities:
+            start = "Gare de " + start_city
+            end = "Gare de " + end_city
+            pathfinder_result = pathfinder(start, end)
+            results.append(pathfinder_result)
+    results.sort(key=lambda x: x["distance"])
+    print(results)
+    return results[0]
