@@ -46,11 +46,12 @@ function App() {
             setListOfTravel([...listOfTravel, res.data.result]);
           res.status === 204 &&
             setListOfTravel([...listOfTravel, ["Pas de résultat"]]);
+          setIsLoading(false);
         })
         .catch((err) => {
           console.error(err);
+          setIsLoading(false);
         });
-      setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [results]);
@@ -99,7 +100,7 @@ function App() {
         </Flex>
         <OrdersAndJourney listOfTravel={listOfTravel} results={results} />
       </Stack>
-      <Train />
+      <Train isLoading={isLoading} />
     </GradiantBackground>
   );
 }

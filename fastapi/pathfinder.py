@@ -133,6 +133,7 @@ def dijkstra(aGraph, start):
 #if __name__ == '__main__':
 
 def pathfinder(start,end):
+    print("pathfinder.py")
     print(start)
     print(end)
 
@@ -176,4 +177,4 @@ def pathfinder(start,end):
 #pathfinder('Gare de Paris-Montparnasse 1-2', 'Gare de Tarbes')
 #pathfinder('Gare de Paris-St-Lazare', 'Gare de Tarbes')
 #pathfinder("Gare de Paris-Austerlitz", "Gare de Tarbes")
-pathfinder("Gare de Paris Gare du Nord", "Gare de Tarbes")
+#pathfinder("Gare de Paris Gare du Nord", "Gare de Tarbes")
