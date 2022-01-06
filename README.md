@@ -1,6 +1,6 @@
 # ITOR
 
-herbergement : https://www.damned-i-am-lost.com/
+herbergement : https://api.damned-i-am-lost.com/ et https://search.damned-i-am-lost.com/
 
 ## Manual install
 
