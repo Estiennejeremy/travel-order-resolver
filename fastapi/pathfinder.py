@@ -143,7 +143,7 @@ def pathfinder(start,end):
     uniquecities = []
     for row in timetables:
         if row[0] not in uniquecities:
-            uniquecities.append(row[0].lower())
+            uniquecities.append(row[0])
 
     g = Graph()
 
@@ -153,7 +153,7 @@ def pathfinder(start,end):
 
     # Add edges
     for row in timetables:
-        g.add_edge(row[0].lower(), row[1].lower(), int(row[2]))
+        g.add_edge(row[0], row[1], int(row[2]))
 
     #print('Graph data:')
     for v in g:
