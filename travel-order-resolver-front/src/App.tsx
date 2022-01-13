@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import { Heading, Stack, Text, Box, Flex, Center } from "@chakra-ui/layout";
-import { IconButton } from "@chakra-ui/react";
+import { IconButton, Textarea, Button } from "@chakra-ui/react";
 import { FaMicrophone } from "react-icons/fa";
 import useSpeechToText from "./Hooks";
 import { ResultType } from "./Hooks/index";
@@ -19,6 +19,7 @@ function App() {
     interimResult,
     isRecording,
     results,
+    setResults,
     startSpeechToText,
     stopSpeechToText,
   } = useSpeechToText({
@@ -30,7 +31,7 @@ function App() {
   });
   const [listOfTravel, setListOfTravel] = useState<string[][]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [value, setValue] = useState('');
   // Ask traversed station to backend when results change
   useEffect(() => {
     if (results.length > 0) {
@@ -55,6 +56,16 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [results]);
+
+  const handleClick = () => {
+    setResults((prevResults) => [
+        ...prevResults,
+      {
+        transcript: value,
+        timestamp: Math.floor(Date.now() / 1000),
+      }
+    ])
+  }
 
   return (
     <GradiantBackground>
@@ -81,6 +92,16 @@ function App() {
         <Text color="whiteAlpha.600">
           {isRecording ? "Stop Recording" : "Start Recording"}
         </Text>
+          <Textarea
+          width={"45%"}
+          value={value}
+          onChange={(e) => {setValue(e.target.value)}}
+          placeholder='Enter your search here'>
+          </Textarea>
+          <Button
+            colorScheme='blue'
+            onClick={handleClick}
+          >Submit</Button>
         <ErrorDisplay error={error} />
         <Flex justify={"space-evenly"} width={"full"}>
           <Box width={"45%"}>

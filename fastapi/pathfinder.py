@@ -91,6 +91,7 @@ def shortest(v, path):
 import heapq
 
 def dijkstra(aGraph, start):
+    print('start in djiksdtra', start)
     #print("Dijkstra's shortest path")
     # Set the distance for the start node to zero 
     start.set_distance(0)
@@ -135,13 +136,14 @@ def dijkstra(aGraph, start):
 def pathfinder(start,end):
     print("pathfinder.py")
     print(start)
+    print(type(start))
     print(end)
 
     # FIND UNIQUE CITIES
     uniquecities = []
     for row in timetables:
         if row[0] not in uniquecities:
-            uniquecities.append(row[0])
+            uniquecities.append(row[0].lower())
 
     g = Graph()
 
@@ -151,7 +153,7 @@ def pathfinder(start,end):
 
     # Add edges
     for row in timetables:
-        g.add_edge(row[0], row[1], int(row[2]))
+        g.add_edge(row[0].lower(), row[1].lower(), int(row[2]))
 
     #print('Graph data:')
     for v in g:

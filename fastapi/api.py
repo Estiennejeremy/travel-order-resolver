@@ -47,14 +47,14 @@ def return_trajet(item: Item):
             print(analyseres)
             
             print("-----------------------------------------------------")
-            print("Find similar start station : " + find_similar_station(analyseres[0]))
-            print("Find similar end station : " + find_similar_station(analyseres[1]))
-            print(find_similar_station(analyseres[0]))
-            print(find_similar_station(analyseres[1]))
-            start = "Gare de " + find_similar_station(analyseres[0])
-            end = "Gare de " + find_similar_station(analyseres[1])
-            
+            #print("Find similar start station : " + find_similar_station(analyseres[0]))
+           # print("Find similar end station : " + find_similar_station(analyseres[1]))
+            print(type(analyseres[0]))
+            #print(find_similar_station(analyseres[0]))
+           # print(find_similar_station(analyseres[1]))
+
             start_cities = find_stations_from_city(analyseres[0])
+            print('start', start_cities)
             end_cities = find_stations_from_city(analyseres[1])
             giga_result = find_shortest_path_between_cities(start_cities, end_cities)
             
@@ -67,6 +67,9 @@ def return_trajet(item: Item):
     
 def find_shortest_path_between_cities(start_cities, end_cities):
     results = []
+    #print('start', start_cities)
+    print('end', end_cities)
+
     for start_city in start_cities:
         for end_city in end_cities:
             start = start_city
