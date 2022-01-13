@@ -1,3 +1,4 @@
+from array import array
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
@@ -10,6 +11,7 @@ import json
 from pathfinder import pathfinder
 from stationparser import find_similar_station
 from stationparser import find_stations_from_city
+from result import AllTrajet
 
 class Item(BaseModel):
     trajet: str
@@ -34,8 +36,39 @@ app.add_middleware(
 def home():
     return "COUCOU"
 
+@app.get("/testNlp")
+def testNlp(trajet: array):
+    result = []
+    print(trajet)
+    for i in trajet:
+        trajet = AllTrajet(i, analyse(i))
+        result.append(trajet)
+    return {'result': result}  # JSONResponse(result)
+        
+
 @app.post("/nlp")
 def return_trajet(item: Item):
+    try:
+        giga_result = all_workflow(item)
+        return {'result': giga_result["crossed_stations"]}  
+    except:
+        raise HTTPException(status_code=204, detail="Item not found")
+    
+    
+def find_shortest_path_between_cities(start_cities, end_cities):
+    results = []
+    for start_city in start_cities:
+        for end_city in end_cities:
+            start = start_city
+            end = end_city
+            pathfinder_result = pathfinder(start, end)
+            results.append(pathfinder_result)
+    results.sort(key=lambda x: x["distance"])
+    print("find_shortest_path_between_cities()")
+    print(results)
+    return results[0]
+
+def all_workflow(item):
     try:
         if item.trajet != "":
             print("-----------------------------------------------------")
@@ -56,24 +89,8 @@ def return_trajet(item: Item):
             
             start_cities = find_stations_from_city(analyseres[0])
             end_cities = find_stations_from_city(analyseres[1])
-            giga_result = find_shortest_path_between_cities(start_cities, end_cities)
-            
-            return {'result': giga_result["crossed_stations"]}
+            return find_shortest_path_between_cities(start_cities, end_cities)
         else:
-            raise HTTPException(status_code=204, detail="Item not found")    
+            raise HTTPException(status_code=204, detail="Item not found")
     except:
         raise HTTPException(status_code=204, detail="Item not found")
-    
-    
-def find_shortest_path_between_cities(start_cities, end_cities):
-    results = []
-    for start_city in start_cities:
-        for end_city in end_cities:
-            start = start_city
-            end = end_city
-            pathfinder_result = pathfinder(start, end)
-            results.append(pathfinder_result)
-    results.sort(key=lambda x: x["distance"])
-    print("find_shortest_path_between_cities()")
-    print(results)
-    return results[0]
