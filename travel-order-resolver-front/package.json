@@ -14,6 +14,7 @@
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
     "axios": "^0.24.0",
+    "evergreen-ui": "^6.7.0",
     "framer-motion": "^4",
     "hark": "^1.2.3",
     "inline-worker": "^1.1.0",
@@ -21,6 +22,7 @@
     "react-dom": "^17.0.2",
     "react-icons": "^4.3.1",
     "react-scripts": "4.0.3",
+    "react-switch": "^6.0.0",
     "typescript": "^4.4.4",
     "web-vitals": "^1.0.1"
   },
@@ -49,6 +51,7 @@
     ]
   },
   "devDependencies": {
-    "@types/hark": "^1.2.2"
+    "@types/hark": "^1.2.2",
+    "@types/styled-components": "^5.1.20"
   }
 }

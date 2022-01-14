@@ -11,11 +11,13 @@ import {
   Center,
 } from "@chakra-ui/layout";
 import { Image } from "@chakra-ui/react";
-import { IconButton, keyframes } from "@chakra-ui/react";
+import { IconButton, keyframes, Button } from "@chakra-ui/react";
 import { FaMicrophone } from "react-icons/fa";
 import useSpeechToText from "./Hooks";
 import { ResultType } from "./Hooks/index";
 import axios from "axios";
+import Switch from "react-switch";
+import { TextInput } from 'evergreen-ui';
 import "./App.css";
 
 function App() {
@@ -78,6 +80,14 @@ function App() {
   };
   const [listOfJourney, setListOfJourney] = useState<string[][]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [order, setOrder] = useState(String);
+
+  const [ordersTab, setOrdersTab] = useState<string[][]>([]);
+
+  function handleOrder() {
+    setOrdersTab(Order => [...Order, [order]])
+    console.log(ordersTab)
+  }
 
   // Ask traversed station to backend when results change
   useEffect(() => {
@@ -100,6 +110,10 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [results]);
 
+  function handleChange() {
+    setIsLoading(!isLoading)
+  }
+
   return (
     <Box
       width={"100%"}
@@ -121,9 +135,21 @@ function App() {
       animation={animation}
     >
       <Stack py={4} direction="column" spacing={6} alignItems="center">
+        <Stack direction="row" style={{ position: 'absolute', left: "5%", top: "5%" }}>
+          <Switch onChange={handleChange} checked={isLoading} />
+          {isLoading ?
+            <Text color={'white'}>
+              Switch to enable the vocal mode
+            </Text> :
+            <Text color={'white'}>
+              Switch to enable the writing mode
+            </Text>
+          }
+        </Stack>
         <Heading as="h1" fontSize="4xl" color="whiteAlpha.700">
           Travel Order Resolver
         </Heading>
+
         <Text fontSize="2xl" color="whiteAlpha.700" align="center">
           Click and hold your mouse on the "record" button while you order your
           train journey.
@@ -151,15 +177,50 @@ function App() {
                 Orders
               </Heading>
             </Center>
+
+            <Center>
+              {isLoading ?
+                <>
+                  <TextInput
+                    onChange={(e: { target: { value: string; }; }) => setOrder(e.target.value)}
+                    placeholder="Type your sentence here"
+                  />
+                  <Button
+                    onClick={handleOrder}
+                  >
+                    <Text>
+                      Validé
+                    </Text>
+                  </Button>
+                </>
+                : <></>
+              }
+            </Center>
+
             <List spacing={3}>
-              {(results as ResultType[]).map((result) => (
-                <Center>
-                  <ListItem key={result.timestamp}>
-                    {result.transcript}
-                  </ListItem>
-                </Center>
-              ))}
+            {console.log("here")}
+              {
+                !isLoading ?
+                  (results as ResultType[]).map((result) => (
+                    <Center> 
+                      <ListItem key={result.timestamp}>
+                        {result.transcript}
+                      </ListItem>
+                    </Center>
+                  ))
+                  :
+                  
+                  (ordersTab.map((ord, index) => {
+                    <ListItem key={index}>
+                      {ord}
+                    </ListItem>
+                  }))
+              }
+
+
             </List>
+
+
           </Box>
           <Box width={"45%"}>
             <Center>
@@ -174,9 +235,8 @@ function App() {
                     <ListItem key={index}>
                       <Text>
                         {journey.map((city, index) => {
-                          return `${city}${
-                            index === journey.length - 1 ? "" : " ➡️ "
-                          }`;
+                          return `${city}${index === journey.length - 1 ? "" : " ➡️ "
+                            }`;
                         })}
                       </Text>
                     </ListItem>
