@@ -37,6 +37,9 @@ def home():
 @app.post("/nlp")
 def return_trajet(item: Item):
     try:
+        trajet = [] 
+        allCity = [] 
+        finalPath = []
         if item.trajet != "":
             print("-----------------------------------------------------")
             print(item.trajet)
@@ -51,14 +54,25 @@ def return_trajet(item: Item):
             print("Find similar end station : " + find_similar_station(analyseres[1]))
             print(find_similar_station(analyseres[0]))
             print(find_similar_station(analyseres[1]))
-            start = "Gare de " + find_similar_station(analyseres[0])
-            end = "Gare de " + find_similar_station(analyseres[1])
+        
+            for i in range(len(analyseres)): 
+                allCity.append(find_stations_from_city(analyseres[i])) 
+                print("Find similar start station : ", find_stations_from_city(analyseres[i]))
+                if len(allCity) > 1: 
+                    print("-------------------BETWEEN---------------------------")
+                    print(allCity[i-1], allCity[i])
+                    trajet.append(find_shortest_path_between_cities(allCity[i-1], allCity[i])["crossed_stations"]) 
+                   
             
-            start_cities = find_stations_from_city(analyseres[0])
-            end_cities = find_stations_from_city(analyseres[1])
-            giga_result = find_shortest_path_between_cities(start_cities, end_cities)
-            
-            return {'result': giga_result["crossed_stations"]}
+            for list in trajet:
+                for t in list:
+                    if( len(finalPath) < 1 or t != finalPath[len(finalPath)-1]):
+                        finalPath.append(t)
+            print("++++++++++++++++++++++++++++++++++++++++++++++++++++")
+            print(finalPath)
+            print("++++++++++++++++++++++++++++++++++++++++++++++++++++")
+
+            return {'result': finalPath}
         else:
             raise HTTPException(status_code=204, detail="Item not found")    
     except:
