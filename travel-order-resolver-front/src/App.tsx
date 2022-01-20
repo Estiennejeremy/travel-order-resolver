@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/layout";
 import { Image } from "@chakra-ui/react";
 import { IconButton, keyframes, Button } from "@chakra-ui/react";
-import { FaMicrophone } from "react-icons/fa";
+import { FaMicrophone, FaTimes, FaCheck } from "react-icons/fa";
 import useSpeechToText from "./Hooks";
 import { ResultType } from "./Hooks/index";
 import axios from "axios";
@@ -82,11 +82,16 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [order, setOrder] = useState(String);
 
-  const [ordersTab, setOrdersTab] = useState<string[][]>([]);
+  const [ordersTab, setOrdersTab] = useState<string[]>([]);
 
   function handleOrder() {
-    setOrdersTab(Order => [...Order, [order]])
-    console.log(ordersTab)
+    setOrdersTab([...ordersTab, order])
+  }
+
+  function removeOrder(index: number) {
+    var tab = ordersTab
+    tab.splice(index, 1)
+    setOrdersTab(tab)
   }
 
   // Ask traversed station to backend when results change
@@ -136,6 +141,7 @@ function App() {
     >
       <Stack py={4} direction="column" spacing={6} alignItems="center">
         <Stack direction="row" style={{ position: 'absolute', left: "5%", top: "5%" }}>
+          {console.log("start")}
           <Switch onChange={handleChange} checked={isLoading} />
           {isLoading ?
             <Text color={'white'}>
@@ -177,48 +183,78 @@ function App() {
                 Orders
               </Heading>
             </Center>
-
-            <Center>
+            {
+              isLoading ?
+                ordersTab.length > 0 ?
+                  <Center position={'absolute'} left={'2%'} top={'41.5%'}>
+                    <Button >
+                      <Text>
+                        Lancer la recherche
+                      </Text>
+                    </Button>
+                  </Center>
+                  :
+                  <></>
+                :
+                <></>
+            }
+            <Center >
               {isLoading ?
                 <>
                   <TextInput
                     onChange={(e: { target: { value: string; }; }) => setOrder(e.target.value)}
                     placeholder="Type your sentence here"
                   />
-                  <Button
-                    onClick={handleOrder}
-                  >
-                    <Text>
-                      Validé
-                    </Text>
-                  </Button>
+                  <IconButton
+                    aria-label="Check"
+                    icon={<FaCheck />}
+                    size="m"
+                    colorScheme="green"
+                    onClick={() => handleOrder()}
+                    left={'20px'}
+                    padding={1}
+                    borderColor={'black'}
+                    borderWidth={0.5}
+                  />
                 </>
                 : <></>
               }
             </Center>
 
             <List spacing={3}>
-            {console.log("here")}
+              {console.log("here")}
+              {console.log(ordersTab)}
               {
                 !isLoading ?
                   (results as ResultType[]).map((result) => (
-                    <Center> 
+                    <Center>
                       <ListItem key={result.timestamp}>
                         {result.transcript}
                       </ListItem>
                     </Center>
                   ))
                   :
-                  
-                  (ordersTab.map((ord, index) => {
-                    <ListItem key={index}>
-                      {ord}
-                    </ListItem>
-                  }))
+                  ordersTab.map((ord, index) => (
+                    <Center>
+                      <ListItem key={index}>
+                        <Stack direction="row" alignItems="center">
+                          <Text>
+                            {ord}
+                          </Text>
+                          <IconButton
+                            aria-label="Suppr"
+                            icon={<FaTimes />}
+                            size="s"
+                            colorScheme="red"
+                            onClick={() => removeOrder(index)}
+                          />
+                        </Stack>
+                      </ListItem>
+                    </Center>
+                  ))
               }
-
-
             </List>
+
 
 
           </Box>
@@ -252,7 +288,7 @@ function App() {
         position={"fixed"}
         bottom={0}
       />
-    </Box>
+    </Box >
   );
 }
 
