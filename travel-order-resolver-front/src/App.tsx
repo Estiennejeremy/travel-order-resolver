@@ -81,17 +81,22 @@ function App() {
   const [listOfJourney, setListOfJourney] = useState<string[][]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [order, setOrder] = useState(String);
+  const [orderToShow, setOrderToShow] = useState("");
 
-  const [ordersTab, setOrdersTab] = useState<string[]>([]);
-
-  function handleOrder() {
-    setOrdersTab([...ordersTab, order])
-  }
-
-  function removeOrder(index: number) {
-    var tab = ordersTab
-    tab.splice(index, 1)
-    setOrdersTab(tab)
+  function fetchTravel() {
+    if (orderToShow !== "") {
+      axios
+        .post("http://localhost:8000/nlp/", {
+          trajet: orderToShow,
+        })
+        .then((res) => {
+          res.status === 200 &&
+            setListOfJourney([...listOfJourney, res.data.result]);
+          res.status === 204 &&
+            setListOfJourney([...listOfJourney, ["No result"]]);
+        });
+      setIsLoading(false);
+    }
   }
 
   // Ask traversed station to backend when results change
@@ -185,9 +190,9 @@ function App() {
             </Center>
             {
               isLoading ?
-                ordersTab.length > 0 ?
+                orderToShow !== "" ?
                   <Center position={'absolute'} left={'2%'} top={'41.5%'}>
-                    <Button >
+                    <Button onClick={() => fetchTravel()}>
                       <Text>
                         Lancer la recherche
                       </Text>
@@ -210,7 +215,7 @@ function App() {
                     icon={<FaCheck />}
                     size="m"
                     colorScheme="green"
-                    onClick={() => handleOrder()}
+                    onClick={() => setOrderToShow(order)}
                     left={'20px'}
                     padding={1}
                     borderColor={'black'}
@@ -234,24 +239,27 @@ function App() {
                     </Center>
                   ))
                   :
-                  ordersTab.map((ord, index) => (
-                    <Center>
-                      <ListItem key={index}>
-                        <Stack direction="row" alignItems="center">
+                  <Center>
+                    <Stack direction="row" alignItems="center">
+                      {console.log(orderToShow)}
+                      {orderToShow !== "" ?
+                        <>
                           <Text>
-                            {ord}
+                            {orderToShow}
                           </Text>
                           <IconButton
                             aria-label="Suppr"
                             icon={<FaTimes />}
                             size="s"
                             colorScheme="red"
-                            onClick={() => removeOrder(index)}
+                            onClick={() => setOrderToShow("")}
                           />
-                        </Stack>
-                      </ListItem>
-                    </Center>
-                  ))
+                        </>
+                        :
+                        <></>
+                      }
+                    </Stack>
+                  </Center>
               }
             </List>
 
