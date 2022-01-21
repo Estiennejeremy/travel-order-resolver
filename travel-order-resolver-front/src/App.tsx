@@ -41,22 +41,27 @@ function App() {
   });
   const [listOfTravel, setListOfTravel] = useState<string[][]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [writtingMode, setWrittingMode] = useState(false);
   const [order, setOrder] = useState(String);
   const [orderToShow, setOrderToShow] = useState("");
 
   function fetchTravel() {
     if (orderToShow !== "") {
       axios
-        .post("http://localhost:8000/nlp/", {
+        .post("http://127.0.0.1:8000/nlp", {
           trajet: orderToShow,
         })
         .then((res) => {
           res.status === 200 &&
-            setListOfJourney([...listOfJourney, res.data.result]);
+            setListOfTravel([...listOfTravel, res.data.result]);
           res.status === 204 &&
-            setListOfJourney([...listOfJourney, ["No result"]]);
+            setListOfTravel([...listOfTravel, ["Pas de résultat"]]);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setIsLoading(false);
         });
-      setIsLoading(false);
     }
   }
 
@@ -85,8 +90,8 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [results]);
 
-  function handleChange() {
-    setIsLoading(!isLoading)
+  function handleChange() { 
+    setWrittingMode(!writtingMode)
   }
 
   return (
@@ -94,7 +99,7 @@ function App() {
       <Stack py={4} direction="column" spacing={6} alignItems="center">
         <Stack direction="row" style={{ position: 'absolute', left: "5%", top: "5%" }}>
           {console.log("start")}
-          <Switch onChange={handleChange} checked={isLoading} />
+          <Switch onChange={handleChange} checked={writtingMode} />
           {isLoading ?
             <Text color={'white'}>
               Switch to enable the vocal mode
@@ -112,6 +117,21 @@ function App() {
           Click and hold your mouse on the "record" button while you order your
           train journey.
         </Text>
+        {
+          writtingMode ? 
+          <IconButton
+          aria-label="record"
+          isRound={true}
+          icon={<FaMicrophone />}
+          size="lg"
+          colorScheme="red"
+          onMouseDown={startSpeechToText}
+          onMouseUp={stopSpeechToText}
+          onMouseLeave={stopSpeechToText}
+          data-recording={isRecording}
+          isDisabled={true}
+        />
+        :
         <IconButton
           aria-label="record"
           isRound={true}
@@ -124,6 +144,7 @@ function App() {
           data-recording={isRecording}
           isDisabled={isLoading}
         />
+        }
         <Text color="whiteAlpha.600">
           {isRecording ? "Stop Recording" : "Start Recording"}
         </Text>
@@ -136,7 +157,7 @@ function App() {
               </Heading>
             </Center>
             {
-              isLoading ?
+              writtingMode ?
                 orderToShow !== "" ?
                   <Center position={'absolute'} left={'2%'} top={'41.5%'}>
                     <Button onClick={() => fetchTravel()}>
@@ -151,7 +172,7 @@ function App() {
                 <></>
             }
             <Center >
-              {isLoading ?
+              {writtingMode ?
                 <>
                   <TextInput
                     onChange={(e: { target: { value: string; }; }) => setOrder(e.target.value)}
@@ -174,10 +195,8 @@ function App() {
             </Center>
 
             <List spacing={3}>
-              {console.log("here")}
-              {console.log(ordersTab)}
               {
-                !isLoading ?
+                !writtingMode ?
                   (results as ResultType[]).map((result) => (
                     <Center>
                       <ListItem key={result.timestamp}>
@@ -217,8 +236,8 @@ function App() {
               </Heading>
             </Center>
             <List spacing={3}>
-              {listOfJourney.length > 0 &&
-                listOfJourney.map((journey, index) => (
+              {listOfTravel.length > 0 &&
+                listOfTravel.map((journey, index) => (
                   <Center>
                     <ListItem key={index}>
                       <Text>
