@@ -311,3 +311,5 @@ def analyse(sentence):
 
 
 # print(analyse("Je souhaite prendre le train à Tarbes et avancer calmement jusqu'a Brest"))
+#print(analyse("Je veux aller de Bayonne à Nice"))
+#print(analyse("Je veux aller de Nice à Bayonne"))

@@ -133,6 +133,7 @@ def dijkstra(aGraph, start):
 #if __name__ == '__main__':
 
 def pathfinder(start,end):
+    print("pathfinder.py")
     print(start)
     print(end)
 
@@ -167,7 +168,13 @@ def pathfinder(start,end):
     shortest(target, path)
     #print('The shortest path : %s' %(path[::-1]))
     print(path[::-1])
-    return path[::-1]
+    print(target.get_distance())
+    return {"crossed_stations": path[::-1], "distance": target.get_distance()}
   
-
+## TESTING
 #pathfinder('Gare de Tarbes','Gare de Ax-les-Thermes')
+#pathfinder('Gare de Bayonne','Gare de Nice-Ville')
+#pathfinder('Gare de Paris-Montparnasse 1-2', 'Gare de Tarbes')
+#pathfinder('Gare de Paris-St-Lazare', 'Gare de Tarbes')
+#pathfinder("Gare de Paris-Austerlitz", "Gare de Tarbes")
+#pathfinder("Gare de Paris Gare du Nord", "Gare de Tarbes")

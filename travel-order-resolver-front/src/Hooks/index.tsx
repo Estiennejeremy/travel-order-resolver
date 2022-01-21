@@ -129,6 +129,7 @@ export default function useSpeechToText({
         "react-hook-speech-to-text is using legacy results, pass useLegacyResults: false to the hook to use the new array of objects results. Legacy array of strings results will be removed in a future version."
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Chrome Speech Recognition API:
