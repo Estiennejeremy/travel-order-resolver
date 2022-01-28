@@ -1,9 +1,11 @@
+from array import array
+from pprint import pprint
+import re
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 from pydantic import BaseModel
 from nlp import analyse
-from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 import json
@@ -13,6 +15,12 @@ from stationparser import find_stations_from_city
 
 class Item(BaseModel):
     trajet: str
+
+
+
+class Results(BaseModel):
+    sentence: str
+    result: list
 
 app = FastAPI()
 
@@ -91,3 +99,23 @@ def find_shortest_path_between_cities(start_cities, end_cities):
     print("find_shortest_path_between_cities()")
     print(results)
     return results[0]
+
+@app.post("/nlpMulti")
+def multiNlp(items: list):
+    results = []
+    try:
+        if(items!= []):
+            for item in items:
+                obj = Item(trajet = item)
+                print(obj)
+                test = return_trajet(obj)
+                print('===================================================')
+                print(test["result"])
+                res = Results(sentence = item, result = test["result"])
+                results.append(res)
+
+            return {'result': results}
+        else:
+            raise HTTPException(status_code=204, detail="Item not found")    
+    except:
+        raise HTTPException(status_code=204, detail="Item not found")
