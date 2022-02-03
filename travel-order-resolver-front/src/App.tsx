@@ -30,6 +30,7 @@ function App() {
     interimResult,
     isRecording,
     results,
+    setResults,
     startSpeechToText,
     stopSpeechToText,
   } = useSpeechToText({
@@ -46,33 +47,44 @@ function App() {
   const [orderToShow, setOrderToShow] = useState("");
 
   function fetchTravel() {
-    if (orderToShow !== "") {
-      axios
-        .post("http://127.0.0.1:8000/nlp", {
-          trajet: orderToShow,
-        })
-        .then((res) => {
-          res.status === 200 &&
-            setListOfTravel([...listOfTravel, res.data.result]);
-          res.status === 204 &&
-            setListOfTravel([...listOfTravel, ["Pas de résultat"]]);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          setIsLoading(false);
-        });
-    }
+    setResults((prevResults)=>[
+      ...prevResults,
+      {
+        transcript: orderToShow,
+        timestamp: Math.floor(Date.now() / 1000),
+      }
+    ])
+
+
+
+    // if (orderToShow !== "") {
+    //   axios
+    //     .post("https://api.damned-i-am-lost.com/nlp", {
+    //       trajet: orderToShow,
+    //     })
+    //     .then((res) => {
+    //       res.status === 200 &&
+    //         setListOfTravel([...listOfTravel, res.data.result]);
+    //       res.status === 204 &&
+    //         setListOfTravel([...listOfTravel, ["Pas de résultat"]]);
+    //       setIsLoading(false);
+    //     })
+    //     .catch((err) => {
+    //       console.error(err);
+    //       setIsLoading(false);
+    //     });
+    // }
   }
 
   // Ask traversed station to backend when results change
   useEffect(() => {
+    console.log(`results`, results)
     if (results.length > 0) {
       const speechResult = results[results.length - 1] as ResultType;
       const lastOrder = speechResult.transcript;
       setIsLoading(true);
       axios
-        .post("http://localhost:8000/nlp/", {
+        .post("https://api.damned-i-am-lost.com/nlp/", {
           trajet: lastOrder,
         })
         .then((res) => {
@@ -194,7 +206,7 @@ function App() {
               }
             </Center>
 
-            <List spacing={3}>
+            {/* <List spacing={3}>
               {
                 !writtingMode ?
                   (results as ResultType[]).map((result) => (
@@ -227,7 +239,7 @@ function App() {
                     </Stack>
                   </Center>
               }
-            </List>
+            </List> */}
           </Box>
           <Box width={"45%"}>
             <Center>
@@ -235,7 +247,7 @@ function App() {
                 Travel journey
               </Heading>
             </Center>
-            <List spacing={3}>
+            {/* <List spacing={3}>
               {listOfTravel.length > 0 &&
                 listOfTravel.map((journey, index) => (
                   <Center>
@@ -249,7 +261,7 @@ function App() {
                     </ListItem>
                   </Center>
                 ))}
-            </List>
+            </List> */}
           </Box>
         </Flex>
         <OrdersAndJourney listOfTravel={listOfTravel} results={results} />
